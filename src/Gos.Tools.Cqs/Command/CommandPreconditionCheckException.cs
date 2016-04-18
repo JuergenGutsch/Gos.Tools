@@ -3,17 +3,21 @@ using System.Collections.Generic;
 
 namespace Gos.Tools.Cqs.Command
 {
-    public class CommandPreconditionCheckException : Exception
+    public class CommandPreconditionCheckException : AggregateException
     {
-        public CommandPreconditionCheckException()
+        public CommandPreconditionCheckException(IEnumerable<CommandPreconditionCheckResult> results)
+            :base(UnionExceptions(results))
         {
         }
 
-        public CommandPreconditionCheckException(IList<string> validationMessages)
+        public static IEnumerable<Exception> UnionExceptions(IEnumerable<CommandPreconditionCheckResult> results)
         {
-            ValidationMessages = validationMessages;
-        }
-
-        public IList<string> ValidationMessages { get; private set; }
+            var exceptions = new List<Exception>();
+            foreach (var result in results)
+            {
+                exceptions.AddRange(result.Exceptions);
+            }
+            return exceptions;
+        } 
     }
 }

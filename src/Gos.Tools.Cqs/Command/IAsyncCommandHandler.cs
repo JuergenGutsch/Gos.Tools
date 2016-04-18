@@ -1,15 +1,13 @@
-﻿namespace Gos.Tools.Cqs.Command
+﻿
+using System.Threading.Tasks;
+
+namespace Gos.Tools.Cqs.Command
 {
-    public interface ICommandHandler
+    public interface IAsyncCommandHandler
     { }
 
-    public interface ICommandHandler<in TCommand> : ICommandHandler where TCommand : ICommand
+    public interface IAsyncCommandHandler<in TCommand> : ICommandHandler where TCommand : ICommand
     {
-        void Handle(TCommand command);
-    }
-
-    public interface ICommandHandler<in TCommand, out TResult> : ICommandHandler where TCommand : ICommand
-    {
-        TResult Handle(TCommand command);
+        Task HandleAsync(TCommand command);
     }
 }

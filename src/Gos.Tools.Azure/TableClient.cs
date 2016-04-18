@@ -21,7 +21,7 @@ namespace Gos.Tools.Azure
         public async void SaveItemOf<T>(T item) where T : IItem, new()
         {
             var itemType = typeof(T);
-            var table = await CloudTable<T>(itemType);
+            var table = await CloudTable<T>();
 
             var entity = new GenericTableEntity
             {
@@ -35,9 +35,9 @@ namespace Gos.Tools.Azure
             var result = await table.ExecuteAsync(operation);
         }
 
-        private async Task<CloudTable> CloudTable<T>(Type itemType) where T : IItem, new()
+        private async Task<CloudTable> CloudTable<T>() where T : IItem, new()
         {
-            var table = _cloudTableClient.GetTableReference(itemType.Name);
+            var table = _cloudTableClient.GetTableReference(typeof(T).Name);
             await table.CreateIfNotExistsAsync();
             return table;
         }
@@ -45,7 +45,7 @@ namespace Gos.Tools.Azure
         public async void SaveAllItemsOf<T>(IEnumerable<T> items) where T : IItem, new()
         {
             var itemType = typeof(T);
-            var table = await CloudTable<T>(itemType);
+            var table = await CloudTable<T>();
 
             var entities = items.Select(item => new GenericTableEntity
             {
@@ -68,7 +68,7 @@ namespace Gos.Tools.Azure
         public async Task<T> GetItemOf<T>(Guid id) where T : IItem, new()
         {
             var itemType = typeof(T);
-            var table = await CloudTable<T>(itemType);
+            var table = await CloudTable<T>();
 
             var query = table.CreateQuery<GenericTableEntity>()
                 .Where(x => x.PartitionKey == itemType.Name && x.RowKey == id.ToString());
@@ -86,11 +86,11 @@ namespace Gos.Tools.Azure
         public async Task<IEnumerable<T>> GetItemsOf<T>() where T : IItem, new()
         {
             var itemType = typeof(T);
-            var table = await CloudTable<T>(itemType);
+            var table = await CloudTable<T>();
 
             var query = table.CreateQuery<GenericTableEntity>()
                 .Where(x => x.PartitionKey == itemType.Name);
-
+            
             var items = new List<T>();
             query.ForEach(entity =>
             {
@@ -104,7 +104,7 @@ namespace Gos.Tools.Azure
         public async void DeleteItemOf<T>(T item) where T : IItem, new()
         {
             var itemType = typeof(T);
-            var table = await CloudTable<T>(itemType);
+            var table = await CloudTable<T>();
 
             var tableItem = new GenericTableEntity
             {

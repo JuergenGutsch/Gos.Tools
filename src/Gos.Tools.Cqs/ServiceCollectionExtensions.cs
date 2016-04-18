@@ -9,10 +9,7 @@ namespace Gos.Tools.Cqs
     {
         public static IServiceCollection AddCqsEngine(this IServiceCollection services)
         {
-            services.AddScoped<IQueryProcessor, QueryProcessor>();
-            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
-
-            return services;
+            return AddCqsEngine(services, x => { });
         }
 
 

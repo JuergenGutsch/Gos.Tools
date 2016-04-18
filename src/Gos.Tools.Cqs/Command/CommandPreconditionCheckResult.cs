@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Gos.Tools.Cqs.Command
 {
@@ -6,11 +8,11 @@ namespace Gos.Tools.Cqs.Command
     {
         public CommandPreconditionCheckResult()
         {
-            IsValid = true;
-            ValidationMessages = new List<string>();
+            Exceptions = new List<Exception>();
         }
 
-        public bool IsValid { get; set; }
-        public IList<string> ValidationMessages { get; set; }
+        public bool IsValid => Exceptions.Any();
+
+        public IList<Exception> Exceptions { get; set; }
     }
 }
