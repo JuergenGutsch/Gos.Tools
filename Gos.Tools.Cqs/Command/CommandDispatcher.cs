@@ -19,6 +19,7 @@ namespace Gos.Tools.Cqs.Command
             _serviceProvider = serviceProvider;
         }
 
+        [DebuggerStepThrough]
         public void DispatchCommand<TCommand>(TCommand command) where TCommand : ICommand
         {
             _logger.LogDebug("Dispatching command {0}", command);
@@ -37,6 +38,7 @@ namespace Gos.Tools.Cqs.Command
             _logger.LogInformation("Execution time for dispatching command {0}: {1}", command, stopwatch.Elapsed.ToString("g"));
         }
 
+        [DebuggerStepThrough]
         public async Task DispatchCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
             _logger.LogDebug("Async dispatching command {0}", command);
