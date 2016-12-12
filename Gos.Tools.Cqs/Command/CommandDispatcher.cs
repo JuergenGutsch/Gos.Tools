@@ -38,6 +38,28 @@ namespace Gos.Tools.Cqs.Command
             _logger.LogInformation("Execution time for dispatching command {0}: {1}", command, stopwatch.Elapsed.ToString("g"));
         }
 
+        private void CheckAllPreconditions<TCommand>(TCommand command) where TCommand : ICommand
+        {
+            var results = new Collection<Exception>();
+            foreach (var condition in _serviceProvider.GetServices<ICommandPrecondition<TCommand>>())
+            {
+                try
+                {
+                    condition.Check(command);
+                }
+                catch (Exception ex)
+                {
+
+                    results.Add(ex);
+                }
+            }
+
+            if (results.Any())
+            {
+                throw new AggregateException(results);
+            }
+        }
+
         [DebuggerStepThrough]
         public async Task DispatchCommandAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
@@ -45,7 +67,7 @@ namespace Gos.Tools.Cqs.Command
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            CheckAllPreconditions(command);
+            await CheckAllPreconditionsAsync(command);
 
             var handlers = _serviceProvider.GetServices<IAsyncCommandHandler<TCommand>>();
             foreach (var handler in handlers)
@@ -57,17 +79,24 @@ namespace Gos.Tools.Cqs.Command
             _logger.LogInformation("Async execution time for dispatching command {0}: {1}", command, stopwatch.Elapsed.ToString("g"));
         }
 
-        private void CheckAllPreconditions<TCommand>(TCommand command) where TCommand : ICommand
+        private async Task CheckAllPreconditionsAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
-            var results = new Collection<CommandPreconditionCheckResult>();
-            foreach (var condition in _serviceProvider.GetServices<ICommandPrecondition<TCommand>>())
+            var results = new Collection<Exception>();
+            foreach (var condition in _serviceProvider.GetServices<IAsyncCommandPrecondition<TCommand>>())
             {
-                results.Add(condition.Check(command));
+                try
+                {
+                    await condition.CheckAsync(command);
+                }
+                catch (Exception ex)
+                {
+                    results.Add(ex);
+                }
             }
 
-            if (results.Any(t => !t.IsValid))
+            if (results.Any())
             {
-                throw new CommandPreconditionCheckException(results.Where(t=> !t.IsValid));
+                throw new AggregateException(results);
             }
         }
     }

@@ -1,7 +1,9 @@
-﻿namespace Gos.Tools.Cqs.Command
+﻿using System.Threading.Tasks;
+
+namespace Gos.Tools.Cqs.Command
 {
     public interface ICommandPrecondition<in TCommand> where TCommand : ICommand
     {
-        CommandPreconditionCheckResult Check(TCommand command);
+        void Check(TCommand command);
     }
 }

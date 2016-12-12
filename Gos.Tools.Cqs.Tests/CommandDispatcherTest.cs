@@ -15,16 +15,16 @@ namespace Gos.Tools.Cqs.Tests
         [TestMethod]
         public void CreateTheCommandDispatcher()
         {
-            
+
         }
 
         [TestMethod]
         public void SimpleDispatching()
         {
-            var commandHandlers = new List<ICommandHandler<TestCommand>>{
+            var commandHandlers = new List<ICommandHandler<ChangeUsersNameCommand>>{
                 new CommandHandler()
             };
-            var commandPreconditions = new List<ICommandPrecondition<TestCommand>>{
+            var commandPreconditions = new List<ICommandPrecondition<ChangeUsersNameCommand>>{
                 new CommandPrecondition()
             };
 
@@ -36,31 +36,40 @@ namespace Gos.Tools.Cqs.Tests
 
             var serviceProvider = new Mock<IServiceProvider>();
             serviceProvider
-                .Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICommandHandler<TestCommand>))))
+                .Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICommandHandler<ChangeUsersNameCommand>))))
                 .Returns(commandHandlers.Select(x => x));
             serviceProvider
-                .Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICommandPrecondition<TestCommand>))))
+                .Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICommandPrecondition<ChangeUsersNameCommand>))))
                 .Returns(commandPreconditions.Select(x => x));
 
             var sut = new CommandDispatcher(loggerFactory.Object, serviceProvider.Object);
-            sut.DispatchCommand(new TestCommand());
+            sut.DispatchCommand(new ChangeUsersNameCommand());
         }
     }
 
-    public class TestCommand : ICommand
+    public class ChangeUsersNameCommand : ICommand
     {
+        public string Name { get; set; }
+        public Guid UserId { get; internal set; }
     }
 
-    public class CommandHandler : ICommandHandler<TestCommand>
+    public class CommandHandler : ICommandHandler<ChangeUsersNameCommand>
     {
-        public void Handle(TestCommand command) { }
+        public void Handle(ChangeUsersNameCommand command) { }
     }
 
-    public class CommandPrecondition : ICommandPrecondition<TestCommand>
+    public class CommandPrecondition : ICommandPrecondition<ChangeUsersNameCommand>
     {
-        public CommandPreconditionCheckResult Check(TestCommand command)
+        public void Check(ChangeUsersNameCommand command)
         {
-            return new CommandPreconditionCheckResult();
+            if (command.UserId == Guid.Empty)
+            {
+                throw new ArgumentException("UserId cannot be empty");
+            }
+            if (String.IsNullOrWhiteSpace(command.Name))
+            {
+                throw new ArgumentNullException("Name cannot be null");
+            }
         }
     }
 }

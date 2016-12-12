@@ -46,6 +46,7 @@
     <Compile Include="Command\ICommand.cs" />
     <Compile Include="Command\ICommandDispatcher.cs" />
     <Compile Include="Command\ICommandHandler.cs" />
+    <Compile Include="Command\IAsyncCommandPrecondition.cs" />
     <Compile Include="Command\ICommandPrecondition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\IHandleQuery.cs" />
