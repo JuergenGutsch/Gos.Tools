@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
+
 namespace Gos.Tools.Cqs.Query
 {
     public sealed class QueryProcessor : IQueryProcessor
@@ -28,22 +29,23 @@ namespace Gos.Tools.Cqs.Query
             var queryResult = handler.Execute((dynamic)query);
 
             stopwatch.Stop();
-            _logger.LogInformation($"Execution time for query {query}: {stopwatch.Elapsed.ToString("g")}");
+            _logger.LogInformation($"Execution time for processing query {query}: {stopwatch.Elapsed.ToString("g")}");
             return queryResult;
         }
 
+        [DebuggerStepThrough]
         public async Task<TResult> ProcessAsync<TResult>(IQuery<TResult> query)
         {
-            _logger.LogDebug($"Processing query {query}");
+            _logger.LogDebug($"Async processing query {query}");
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
+            
             var handlerType = typeof(IHandleQueryAsync<,>).MakeGenericType(query.GetType(), typeof(TResult));
             dynamic handler = _serviceProvider.GetService(handlerType);
             var queryResult = await handler.ExecuteAsync((dynamic)query).ConfigureAwait(false);
 
             stopwatch.Stop();
-            _logger.LogInformation($"Execution time for query {query}: {stopwatch.Elapsed.ToString("g")}");
+            _logger.LogInformation($"Async execution time for processing query {query}: {stopwatch.Elapsed.ToString("g")}");
             return queryResult;
         }
     }

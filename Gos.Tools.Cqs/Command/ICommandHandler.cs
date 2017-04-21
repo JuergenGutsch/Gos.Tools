@@ -7,9 +7,4 @@
     {
         void Handle(TCommand command);
     }
-
-    public interface ICommandHandler<in TCommand, out TResult> : ICommandHandler where TCommand : ICommand
-    {
-        TResult Handle(TCommand command);
-    }
 }
