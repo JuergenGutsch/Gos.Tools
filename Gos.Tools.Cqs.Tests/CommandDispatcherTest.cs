@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gos.Tools.Cqs.Command;
-using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Xunit;
+using Gos.Tools.Cqs.Command;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Gos.Tools.Cqs.Tests
 {
-    [TestClass]
     public class CommandDispatcherTest
     {
-        [TestMethod]
+        [Fact]
         public void CreateTheCommandDispatcher()
         {
 
         }
 
-        [TestMethod]
+        [Fact]
         public void SimpleDispatching()
         {
             var commandHandlers = new List<ICommandHandler<ChangeUsersNameCommand>>{
@@ -36,10 +35,10 @@ namespace Gos.Tools.Cqs.Tests
 
             var serviceProvider = new Mock<IServiceProvider>();
             serviceProvider
-                .Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICommandHandler<ChangeUsersNameCommand>))))
+                .Setup(x => x.GetServices<ICommandHandler<ChangeUsersNameCommand>>())
                 .Returns(commandHandlers.Select(x => x));
             serviceProvider
-                .Setup(x => x.GetService(It.Is<Type>(t => t == typeof(ICommandPrecondition<ChangeUsersNameCommand>))))
+                .Setup(x => x.GetServices<ICommandPrecondition<ChangeUsersNameCommand>>())
                 .Returns(commandPreconditions.Select(x => x));
 
             var sut = new CommandDispatcher(loggerFactory.Object, serviceProvider.Object);

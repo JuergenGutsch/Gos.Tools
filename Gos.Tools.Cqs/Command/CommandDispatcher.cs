@@ -49,7 +49,6 @@ namespace Gos.Tools.Cqs.Command
                 }
                 catch (Exception ex)
                 {
-
                     results.Add(ex);
                 }
             }
