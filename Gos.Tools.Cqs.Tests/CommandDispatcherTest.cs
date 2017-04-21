@@ -21,11 +21,17 @@ namespace Gos.Tools.Cqs.Tests
         public void SimpleDispatching()
         {
             var commandHandlers = new List<ICommandHandler<ChangeUsersNameCommand>>{
-                new CommandHandler()
-            };
+                 new CommandHandler()
+             };
             var commandPreconditions = new List<ICommandPrecondition<ChangeUsersNameCommand>>{
-                new CommandPrecondition()
-            };
+                 new CommandPrecondition()
+             };
+
+            var services = new ServiceCollection();
+            services.AddScoped<ICommandHandler<ChangeUsersNameCommand>, CommandHandler>();
+            services.AddScoped<ICommandPrecondition<ChangeUsersNameCommand>, CommandPrecondition>();
+
+            var serviceProvider = services.BuildServiceProvider();
 
             var logger = new Mock<ILogger>();
             var loggerFactory = new Mock<ILoggerFactory>();
@@ -33,16 +39,12 @@ namespace Gos.Tools.Cqs.Tests
                 .Setup(x => x.CreateLogger(It.IsAny<String>()))
                 .Returns(logger.Object);
 
-            var serviceProvider = new Mock<IServiceProvider>();
-            serviceProvider
-                .Setup(x => x.GetServices<ICommandHandler<ChangeUsersNameCommand>>())
-                .Returns(commandHandlers.Select(x => x));
-            serviceProvider
-                .Setup(x => x.GetServices<ICommandPrecondition<ChangeUsersNameCommand>>())
-                .Returns(commandPreconditions.Select(x => x));
-
-            var sut = new CommandDispatcher(loggerFactory.Object, serviceProvider.Object);
-            sut.DispatchCommand(new ChangeUsersNameCommand());
+            var sut = new CommandDispatcher(loggerFactory.Object, serviceProvider);
+            sut.DispatchCommand(new ChangeUsersNameCommand
+            {
+                UserId = Guid.NewGuid(),
+                Name = "Juergen"
+            });
         }
     }
 
